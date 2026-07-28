@@ -1,0 +1,8 @@
+{
+  "name": "Gray Hat",
+  "description": "Repositório aberto de conhecimento sobre negócios digitais, IA, marketing, programação e criação de conteúdo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

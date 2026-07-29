@@ -78,8 +78,13 @@ export function normalizeVideoLink(rawUrl: string, sourceType: SupportedVideoSou
   }
 
   if (sourceType === 'zdmplay') {
-    if (url.protocol !== 'https:' || host !== 'cdn.zdmplay.com' || !url.pathname.startsWith('/videos/')) {
-      return { embedUrl: '', error: 'Use um link HTTPS de cdn.zdmplay.com/videos/.' };
+    const isCdnVideo = host === 'cdn.zdmplay.com' && url.pathname.startsWith('/videos/');
+    const isApiStream = host === 'app.zdmplay.com' && url.pathname.startsWith('/api/stream/');
+    if (url.protocol !== 'https:' || (!isCdnVideo && !isApiStream)) {
+      return {
+        embedUrl: '',
+        error: 'Use um link HTTPS de cdn.zdmplay.com/videos/ ou app.zdmplay.com/api/stream/.'
+      };
     }
     return { embedUrl: url.toString() };
   }

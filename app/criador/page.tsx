@@ -579,7 +579,7 @@ function CreatorPanelContent() {
                               <option value="vimeo">Vimeo (Link)</option>
                               <option value="cloudflare">Cloudflare Stream</option>
                               <option value="bunny">Bunny Stream</option>
-                              <option value="zdmplay">ZDM Play (cdn.zdmplay.com)</option>
+                              <option value="zdmplay">ZDM Play (CDN / API Stream)</option>
                               <option value="telegram">Telegram (Link da mensagem)</option>
                             </select>
 

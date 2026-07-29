@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import { Course, CourseLevel, Module, Lesson, VideoSourceType } from '@/lib/types';
+import { normalizeVideoLink, SupportedVideoSource } from '@/lib/video-links';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { AdminGate } from '@/components/admin-gate';
@@ -126,10 +127,45 @@ function CreatorPanelContent() {
     }));
   };
 
+  const handleDeleteLesson = (modId: string, lessonId: string) => {
+    if (!confirm('Deseja apagar esta aula?')) return;
+    setModules(previous => previous.map(module => module.id === modId
+      ? {
+          ...module,
+          lessons: module.lessons
+            .filter(lesson => lesson.id !== lessonId)
+            .map((lesson, index) => ({ ...lesson, order: index + 1 }))
+        }
+      : module
+    ));
+  };
+
+  const handleDeleteModule = (modId: string) => {
+    if (!confirm('Deseja apagar este módulo e todas as aulas dele?')) return;
+    setModules(previous => previous
+      .filter(module => module.id !== modId)
+      .map((module, index) => ({ ...module, order: index + 1 }))
+    );
+  };
+
   const handleSaveCourse = (submitForReview: boolean) => {
     if (!title.trim()) {
       alert('Por favor, informe o título do curso.');
       return;
+    }
+
+    for (const courseModule of modules) {
+      for (const lesson of courseModule.lessons) {
+        if (lesson.videoSourceType === 'upload') {
+          alert(`Selecione uma plataforma válida para a aula "${lesson.title}".`);
+          return;
+        }
+        const video = normalizeVideoLink(lesson.videoUrl, lesson.videoSourceType as SupportedVideoSource);
+        if (video.error) {
+          alert(`Link inválido na aula "${lesson.title}": ${video.error}`);
+          return;
+        }
+      }
     }
 
     const tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
@@ -465,6 +501,14 @@ function CreatorPanelContent() {
                         <PlusCircle className="w-3.5 h-3.5" />
                         <span>Aula</span>
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteModule(mod.id)}
+                        title="Apagar módulo"
+                        className="p-1.5 text-rose-300 hover:text-rose-200 hover:bg-rose-500/10 border border-rose-500/20 rounded-lg"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
 
                     {/* Lessons inside Module */}
@@ -487,6 +531,14 @@ function CreatorPanelContent() {
                               onChange={(e) => handleLessonChange(mod.id, les.id, 'durationMinutes', Number(e.target.value))}
                               className="w-20 bg-[#050505] border border-white/10 rounded px-2.5 py-1 text-white font-mono"
                             />
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteLesson(mod.id, les.id)}
+                              title="Apagar aula"
+                              className="p-1.5 text-rose-300 hover:text-rose-200 hover:bg-rose-500/10 rounded"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
 
                           {/* Video Source Selector */}
@@ -501,7 +553,7 @@ function CreatorPanelContent() {
                               <option value="vimeo">Vimeo (Link)</option>
                               <option value="cloudflare">Cloudflare Stream</option>
                               <option value="bunny">Bunny Stream</option>
-                              <option value="upload">Upload / Direct MP4</option>
+                              <option value="zdmplay">ZDM Play (cdn.zdmplay.com)</option>
                             </select>
 
                             <input

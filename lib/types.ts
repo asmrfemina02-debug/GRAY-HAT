@@ -40,7 +40,7 @@ export interface Category {
 
 export type CourseLevel = 'Iniciante' | 'Intermediário' | 'Avançado';
 export type CourseStatus = 'draft' | 'pending' | 'published' | 'rejected' | 'changes_requested';
-export type VideoSourceType = 'youtube' | 'gdrive' | 'vimeo' | 'cloudflare' | 'bunny' | 'upload';
+export type VideoSourceType = 'youtube' | 'gdrive' | 'vimeo' | 'cloudflare' | 'bunny' | 'zdmplay' | 'upload';
 
 export interface LessonResource {
   id: string;

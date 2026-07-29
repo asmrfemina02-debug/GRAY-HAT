@@ -7,6 +7,7 @@ import { useApp } from '@/lib/store';
 import { Course, CourseLevel, Module, Lesson, VideoSourceType } from '@/lib/types';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { AdminGate } from '@/components/admin-gate';
 import {
   PlusCircle,
   Video,
@@ -30,8 +31,8 @@ import {
   Link as LinkIcon
 } from 'lucide-react';
 
-export default function CreatorPanelPage() {
-  const { courses, currentUser, createOrUpdateCourse, deleteCourse, categories } = useApp();
+function CreatorPanelContent() {
+  const { courses, createOrUpdateCourse, deleteCourse, categories } = useApp();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'create' | 'comments' | 'profile'>('courses');
@@ -71,7 +72,7 @@ export default function CreatorPanelPage() {
     }
   ]);
 
-  const creatorCourses = courses.filter(c => c.teacherId === currentUser.id || currentUser.role === 'admin' || true); // View creator courses
+  const creatorCourses = courses;
 
   const publishedCourses = creatorCourses.filter(c => c.status === 'published');
   const pendingCourses = creatorCourses.filter(c => c.status === 'pending');
@@ -548,5 +549,13 @@ export default function CreatorPanelPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function CreatorPanelPage() {
+  return (
+    <AdminGate>
+      <CreatorPanelContent />
+    </AdminGate>
   );
 }

@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css'; // Global styles
 import { AppProvider } from '@/lib/store';
 import { FirebaseAnalytics } from '@/components/firebase-analytics';
+import { AdminAuthProvider } from '@/lib/admin-auth';
 
 export const metadata: Metadata = {
   title: 'Gray Hat — Repositório Aberto de Conhecimento Digital',
@@ -13,9 +14,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="pt-BR">
       <body suppressHydrationWarning className="bg-[#050505] text-[#e5e5e5] antialiased">
         <FirebaseAnalytics />
-        <AppProvider>
-          {children}
-        </AppProvider>
+        <AdminAuthProvider>
+          <AppProvider>
+            {children}
+          </AppProvider>
+        </AdminAuthProvider>
       </body>
     </html>
   );

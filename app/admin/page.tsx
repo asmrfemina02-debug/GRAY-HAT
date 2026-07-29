@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { AdminGate } from '@/components/admin-gate';
+import { AdminEmailManager } from '@/components/admin-email-manager';
+import { useAdminAuth } from '@/lib/admin-auth';
 import { Course } from '@/lib/types';
 import {
   ShieldCheck,
@@ -21,11 +24,13 @@ import {
   Sparkles,
   Shield,
   Trash2,
-  ExternalLink
+  ExternalLink,
+  LogOut
 } from 'lucide-react';
 
-export default function AdminPanelPage() {
+function AdminPanelContent() {
   const { courses, approveCourse, rejectCourse, toggleFeatureCourse, deleteCourse, comments, moderateComment, reports, resolveReport } = useApp();
+  const { user, logout } = useAdminAuth();
 
   const [activeTab, setActiveTab] = useState<'submissions' | 'courses' | 'comments' | 'reports'>('submissions');
   const [rejectingCourseId, setRejectingCourseId] = useState<string | null>(null);
@@ -75,12 +80,26 @@ export default function AdminPanelPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="hidden text-right sm:block">
+              <p className="text-xs text-white/70">{user?.email}</p>
+              <p className="font-mono text-[9px] uppercase tracking-wider text-white/35">Administrador</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void logout()}
+              className="rounded-xl border border-white/10 bg-[#0d0d0d] p-3 text-white/50 transition-colors hover:text-white"
+              title="Sair do painel"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
             <div className="p-3 bg-[#0d0d0d] border border-white/10 rounded-xl text-xs text-center font-mono">
               <span className="text-white/40 block uppercase text-[10px] tracking-wider">Pendentes de Revisão</span>
               <span className="text-lg font-bold text-amber-300">{pendingSubmissions.length}</span>
             </div>
           </div>
         </div>
+
+        <AdminEmailManager />
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-white/10 text-xs font-mono uppercase tracking-wider overflow-x-auto pb-1">
@@ -288,5 +307,13 @@ export default function AdminPanelPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function AdminPanelPage() {
+  return (
+    <AdminGate>
+      <AdminPanelContent />
+    </AdminGate>
   );
 }

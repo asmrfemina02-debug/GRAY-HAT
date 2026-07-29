@@ -3,10 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { useApp } from '@/lib/store';
+import { useAdminAuth } from '@/lib/admin-auth';
 import { Terminal, Shield, Github, Youtube, Heart, Sparkles } from 'lucide-react';
 
 export function Footer() {
   const { currentUser } = useApp();
+  const { isAdmin } = useAdminAuth();
 
   return (
     <footer className="bg-[#050505] border-t border-white/10 text-white/60 py-12 px-4 sm:px-6 lg:px-8 font-sans">
@@ -45,7 +47,9 @@ export function Footer() {
           <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40 mb-3">Comunidade & Criadores</h4>
           <ul className="space-y-2 text-xs">
             <li><Link href="/metodo" className="hover:text-white transition-colors">White, Gray e Black Hat</Link></li>
-            <li><Link href="/criador" className="hover:text-white transition-colors">Publicar um Curso Gratuito</Link></li>
+            {isAdmin && (
+              <li><Link href="/criador" className="hover:text-white transition-colors">Publicar um Curso</Link></li>
+            )}
             <li><Link href="/cursos?favorite=true" className="hover:text-white transition-colors">Minha Lista (Favoritos)</Link></li>
             <li><Link href={`/perfil/${currentUser.id}`} className="hover:text-white transition-colors">Meu Desempenho & Medalhas</Link></li>
             <li><Link href="/admin" className="hover:text-purple-300 transition-colors">Painel de Moderação</Link></li>

@@ -90,6 +90,7 @@ export interface Module {
   courseId: string;
   title: string;
   description?: string;
+  coverUrl?: string;
   order: number;
   lessons: Lesson[];
 }

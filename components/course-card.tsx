@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Course } from '@/lib/types';
 import { useApp } from '@/lib/store';
-import { Star, Users, Clock, Bookmark, Play, CheckCircle2 } from 'lucide-react';
+import { Star, Users, Clock, Bookmark, Play, Layers } from 'lucide-react';
 
 interface CourseCardProps {
   course: Course;
@@ -74,6 +74,10 @@ export function CourseCard({ course, compact = false }: CourseCardProps) {
         <div className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/80 text-white/70 text-[10px] font-mono flex items-center gap-1 border border-white/10">
           <Clock className="w-3 h-3 text-white/50" />
           <span>{course.durationMinutes} min</span>
+        </div>
+        <div className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/80 text-white/70 text-[10px] font-mono flex items-center gap-1 border border-white/10">
+          <Layers className="w-3 h-3 text-emerald-300" />
+          <span>{course.modules?.length || 0} módulos</span>
         </div>
       </div>
 

@@ -511,6 +511,32 @@ function CreatorPanelContent() {
                       </button>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-3 items-center">
+                      <div className="aspect-video rounded-lg overflow-hidden bg-[#0d0d0d] border border-white/10">
+                        {mod.coverUrl ? (
+                          <img src={mod.coverUrl} alt={`Capa de ${mod.title}`} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[10px] font-mono uppercase tracking-wider text-white/30">
+                            Sem capa
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="font-mono uppercase text-[10px] tracking-wider text-white/50">URL da capa do módulo</label>
+                        <input
+                          type="url"
+                          placeholder="https://.../capa-do-modulo.jpg"
+                          value={mod.coverUrl || ''}
+                          onChange={(e) => {
+                            const coverUrl = e.target.value;
+                            setModules(previous => previous.map(module => module.id === mod.id ? { ...module, coverUrl } : module));
+                          }}
+                          className="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-white/30"
+                        />
+                        <p className="text-[10px] text-white/35">Formato recomendado: vertical 2:3, como uma capa de streaming.</p>
+                      </div>
+                    </div>
+
                     {/* Lessons inside Module */}
                     <div className="space-y-3 pl-4 border-l-2 border-white/10">
                       {mod.lessons.map((les, lesIdx) => (

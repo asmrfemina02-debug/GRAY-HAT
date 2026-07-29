@@ -519,10 +519,19 @@ export default function LessonPlayerPage({
 
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
               {course.modules?.map((mod, modIdx) => (
-                <div key={mod.id} className="space-y-1">
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-white/40 px-1">
-                    {mod.title}
-                  </p>
+                <div key={mod.id} className="space-y-1.5">
+                  <Link href={`/curso/${course.id}`} className="relative h-20 rounded-xl overflow-hidden border border-white/10 block group">
+                    <img
+                      src={mod.coverUrl || course.coverUrl || '/curso-padrao.svg'}
+                      alt={mod.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-transparent" />
+                    <div className="absolute inset-0 p-3 flex flex-col justify-end">
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-emerald-300">Módulo {modIdx + 1}</span>
+                      <p className="text-xs font-bold text-white line-clamp-2">{mod.title}</p>
+                    </div>
+                  </Link>
                   <div className="space-y-1">
                     {mod.lessons?.map((les) => {
                       const isCurrent = les.id === currentLesson.id;

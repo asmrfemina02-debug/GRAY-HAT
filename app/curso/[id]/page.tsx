@@ -15,8 +15,6 @@ import {
   Clock,
   Bookmark,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
   FileText,
   MessageSquare,
   Award,
@@ -32,7 +30,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<'modules' | 'about' | 'reviews'>('modules');
-  const [openModuleIds, setOpenModuleIds] = useState<string[]>(['mod-1', 'mod-2', 'mod-tt-1', 'mod-tr-1', 'mod-p1']);
 
   // New Review form state
   const [newRating, setNewRating] = useState(5);
@@ -69,12 +66,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     !userProgress.some(p => p.courseId === course.id && p.lessonId === l.id && p.completed)
   );
   const targetLessonId = nextUncompletedLesson?.id || firstLesson?.id || 'l1';
-
-  const toggleModule = (modId: string) => {
-    setOpenModuleIds(prev =>
-      prev.includes(modId) ? prev.filter(m => m !== modId) : [...prev, modId]
-    );
-  };
 
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -257,79 +248,78 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
             </button>
           </div>
 
-          {/* TAB 1: MODULES ACCORDION */}
+          {/* TAB 1: STREAMING-STYLE MODULE SHELF */}
           {activeTab === 'modules' && (
-            <div className="space-y-4">
+            <div className="space-y-5">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-emerald-300">Sua jornada</p>
+                  <h2 className="text-2xl sm:text-3xl font-serif italic text-white mt-1">Escolha um módulo</h2>
+                </div>
+                <span className="text-xs font-mono text-white/40 shrink-0">{course.modules?.length || 0} MÓDULOS</span>
+              </div>
+
               {course.modules && course.modules.length > 0 ? (
-                course.modules.map((module, modIdx) => {
-                  const isOpen = openModuleIds.includes(module.id);
-                  return (
-                    <div key={module.id} className="bg-[#0d0d0d] border border-white/10 rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => toggleModule(module.id)}
-                        className="w-full p-4 flex items-center justify-between text-left hover:bg-white/[0.03] transition-colors"
-                      >
-                        <div>
-                          <h3 className="font-semibold text-base text-white">
-                            {module.title}
-                          </h3>
-                          {module.description && (
-                            <p className="text-xs text-white/50 mt-0.5">{module.description}</p>
-                          )}
+                <div className="flex gap-4 sm:gap-5 overflow-x-auto pb-5 snap-x snap-mandatory">
+                  {course.modules.map((module, modIdx) => {
+                    const moduleLessons = module.lessons || [];
+                    const completedInModule = moduleLessons.filter(lesson =>
+                      userProgress.some(progress => progress.courseId === course.id && progress.lessonId === lesson.id && progress.completed)
+                    ).length;
+                    const moduleProgress = moduleLessons.length ? Math.round((completedInModule / moduleLessons.length) * 100) : 0;
+                    const firstModuleLesson = moduleLessons[0];
+                    const nextModuleLesson = moduleLessons.find(lesson =>
+                      !userProgress.some(progress => progress.courseId === course.id && progress.lessonId === lesson.id && progress.completed)
+                    ) || firstModuleLesson;
+
+                    const card = (
+                      <div className="group relative aspect-[2/3] overflow-hidden rounded-xl border border-white/10 bg-[#111] shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:border-white/30">
+                        <img
+                          src={module.coverUrl || course.coverUrl || '/curso-padrao.svg'}
+                          alt={module.title}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-black/5" />
+                        <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-black/70 border border-white/20 backdrop-blur flex items-center justify-center text-xs font-mono font-bold text-white">
+                          {String(modIdx + 1).padStart(2, '0')}
                         </div>
-                        <div className="flex items-center gap-3 font-mono text-xs">
-                          <span className="text-white/40">{module.lessons?.length || 0} AULAS</span>
-                          {isOpen ? <ChevronUp className="w-4 h-4 text-white/50" /> : <ChevronDown className="w-4 h-4 text-white/50" />}
+                        <span className="absolute top-3 right-3 px-2 py-1 rounded-md bg-emerald-500/90 text-black text-[9px] font-mono font-bold uppercase tracking-wider">
+                          {moduleLessons.length} {moduleLessons.length === 1 ? 'aula' : 'aulas'}
+                        </span>
+
+                        <div className="absolute inset-x-0 bottom-0 p-4 space-y-3">
+                          <div>
+                            <h3 className="text-lg font-bold leading-tight text-white line-clamp-3 drop-shadow-lg">{module.title}</h3>
+                            {module.description && <p className="text-xs text-white/60 line-clamp-2 mt-1">{module.description}</p>}
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[9px] font-mono uppercase text-white/60">
+                              <span>{completedInModule}/{moduleLessons.length} concluídas</span>
+                              <span>{moduleProgress}%</span>
+                            </div>
+                            <div className="h-1 rounded-full bg-white/20 overflow-hidden">
+                              <div className="h-full bg-emerald-400" style={{ width: `${moduleProgress}%` }} />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider font-bold text-white">
+                            <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
+                              <Play className="w-3.5 h-3.5 fill-black" />
+                            </span>
+                            <span>{completedInModule ? 'Continuar módulo' : 'Começar módulo'}</span>
+                          </div>
                         </div>
-                      </button>
+                      </div>
+                    );
 
-                      {isOpen && (
-                        <div className="border-t border-white/10 divide-y divide-white/5 bg-[#050505]">
-                          {module.lessons?.map((lesson, lesIdx) => {
-                            const isCompleted = userProgress.some(p => p.courseId === course.id && p.lessonId === lesson.id && p.completed);
-
-                            return (
-                              <Link
-                                key={lesson.id}
-                                href={`/curso/${course.id}/aula/${lesson.id}`}
-                                className="p-3.5 px-5 flex items-center justify-between hover:bg-white/5 transition-colors group"
-                              >
-                                <div className="flex items-center gap-3">
-                                  {isCompleted ? (
-                                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                                  ) : (
-                                    <div className="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center text-[10px] text-white/50 font-mono group-hover:border-white group-hover:text-white">
-                                      {lesIdx + 1}
-                                    </div>
-                                  )}
-
-                                  <div>
-                                    <h4 className="font-medium text-sm text-white/90 group-hover:text-white transition-colors">
-                                      {lesson.title}
-                                    </h4>
-                                    <p className="text-xs text-white/50 line-clamp-1">{lesson.description}</p>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 text-xs text-white/50 shrink-0 font-mono">
-                                  {lesson.isPreview && (
-                                    <span className="px-2 py-0.5 bg-white/10 text-white border border-white/15 rounded text-[9px] uppercase tracking-wider font-semibold">
-                                      Preview
-                                    </span>
-                                  )}
-                                  <span className="flex items-center gap-1 text-[10px]">
-                                    <Clock className="w-3 h-3 text-white/40" />
-                                    {lesson.durationMinutes} min
-                                  </span>
-                                </div>
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
+                    return nextModuleLesson ? (
+                      <Link key={module.id} href={`/curso/${course.id}/aula/${nextModuleLesson.id}`} className="w-[210px] sm:w-[240px] lg:w-[260px] shrink-0 snap-start">
+                        {card}
+                      </Link>
+                    ) : (
+                      <div key={module.id} className="w-[210px] sm:w-[240px] lg:w-[260px] shrink-0 snap-start opacity-60">{card}</div>
+                    );
+                  })}
+                </div>
               ) : (
                 <p className="text-xs font-mono text-white/40">Nenhum módulo cadastrado ainda.</p>
               )}

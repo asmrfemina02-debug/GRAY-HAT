@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Course } from '@/lib/types';
 import { useApp } from '@/lib/store';
+import { getPublicTeacherName } from '@/lib/course-utils';
 import { Star, Users, Clock, Bookmark, Play, Layers } from 'lucide-react';
 
 interface CourseCardProps {
@@ -15,6 +16,7 @@ export function CourseCard({ course, compact = false }: CourseCardProps) {
   const { favorites, toggleFavorite, userProgress } = useApp();
 
   const isFavorite = favorites.includes(course.id);
+  const publicTeacherName = getPublicTeacherName(course.teacherName);
 
   // Compute progress for this course
   const courseLessons = course.modules?.flatMap(m => m.lessons) || [];
@@ -127,10 +129,10 @@ export function CourseCard({ course, compact = false }: CourseCardProps) {
           <div className="flex items-center gap-2">
             <img
               src={course.teacherAvatar}
-              alt={course.teacherName}
+              alt={publicTeacherName}
               className="w-5 h-5 rounded-full object-cover ring-1 ring-white/20"
             />
-            <span className="truncate max-w-[120px] text-white/70 text-xs">{course.teacherName}</span>
+            <span className="truncate max-w-[120px] text-white/70 text-xs">{publicTeacherName}</span>
           </div>
 
           <div className="flex items-center gap-1 text-[10px] font-mono text-white/40">

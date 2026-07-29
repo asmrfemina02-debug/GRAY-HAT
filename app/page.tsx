@@ -33,7 +33,6 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const publishedCourses = courses.filter(c => c.status === 'published');
-  const featuredCourses = publishedCourses.filter(c => c.isFeatured);
   const trendingCourses = publishedCourses.filter(c => c.isTrending || c.rating >= 4.8);
 
   // Courses in progress for "Continue Assistindo"
@@ -224,8 +223,8 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* CATEGORIAS POPULARES GRID */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* CATEGORIAS POPULARES: CARROSSEL INFINITO */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div>
               <h2 className="text-2xl font-serif italic text-white tracking-tight">Categorias em Destaque</h2>
@@ -236,53 +235,32 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {categories.slice(0, 10).map(cat => (
-              <Link
-                key={cat.id}
-                href={`/cursos?cat=${cat.id}`}
-                className="group p-4 bg-[#0d0d0d] hover:bg-[#121212] border border-white/10 hover:border-white/25 rounded-xl transition-all flex flex-col justify-between gap-3 shadow-md"
-              >
-                <div className="p-2.5 rounded-lg bg-[#050505] w-fit border border-white/10 group-hover:border-white/20 transition-colors">
-                  {getCategoryIcon(cat.icon)}
+          <div className="category-carousel relative overflow-hidden">
+            <div className="category-carousel-track flex w-max">
+              {[0, 1].map(copyIndex => (
+                <div key={copyIndex} className="flex gap-4 pr-4" aria-hidden={copyIndex === 1}>
+                  {categories.map(cat => (
+                    <Link
+                      key={`${copyIndex}-${cat.id}`}
+                      href={`/cursos?cat=${cat.id}`}
+                      tabIndex={copyIndex === 1 ? -1 : undefined}
+                      className="group w-[210px] sm:w-[240px] min-h-32 shrink-0 p-4 bg-[#0d0d0d] hover:bg-[#151515] border border-white/10 hover:border-emerald-400/40 rounded-xl transition-all flex flex-col justify-between gap-4 shadow-md hover:-translate-y-1"
+                    >
+                      <div className="p-2.5 rounded-lg bg-[#050505] w-fit border border-white/10 group-hover:border-emerald-400/30 transition-colors">
+                        {getCategoryIcon(cat.icon)}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-base text-white group-hover:text-emerald-100 transition-colors">
+                          {cat.name}
+                        </h3>
+                        <p className="text-[10px] font-mono text-white/40 mt-0.5">{cat.courseCount} CURSOS</p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm text-white group-hover:text-white/80 transition-colors">
-                    {cat.name}
-                  </h3>
-                  <p className="text-[10px] font-mono text-white/40 mt-0.5">{cat.courseCount} CURSOS</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* CURSOS EM DESTAQUE */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <h2 className="text-2xl font-serif italic text-white tracking-tight">Novos & Em Destaque</h2>
-              </div>
-              <p className="text-xs text-white/50">Conteúdos revisados e aprovados pela administração</p>
-            </div>
-            <Link href="/cursos" className="text-xs font-mono text-white/60 hover:text-white flex items-center gap-1 uppercase tracking-wider">
-              Ver catálogo completo <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {featuredCourses.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredCourses.map(course => (
-                <CourseCard key={course.id} course={course} />
               ))}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-12 text-center">
-              <p className="text-sm text-white/60">Nenhum curso publicado até o momento.</p>
-            </div>
-          )}
+          </div>
         </section>
 
       </main>

@@ -246,7 +246,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       bannerUrl: courseData.bannerUrl || '/curso-padrao.svg',
       categoryId: courseData.categoryId || 'cat-ia',
       teacherId: adminAccount.uid,
-      teacherName: adminAccount.displayName || adminAccount.email || 'Administrador',
+      teacherName: adminAccount.displayName || 'Equipe Gray Hat',
       teacherAvatar: adminAccount.photoURL || '/avatar-padrao.svg',
       level: courseData.level || 'Iniciante',
       durationMinutes: courseData.durationMinutes || 0,

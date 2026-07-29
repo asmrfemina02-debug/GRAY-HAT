@@ -8,6 +8,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { CourseCard } from '@/components/course-card';
 import { Lesson } from '@/lib/types';
+import { getPublicTeacherName } from '@/lib/course-utils';
 import {
   Play,
   Star,
@@ -54,6 +55,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   }
 
   const isFavorite = favorites.includes(course.id);
+  const publicTeacherName = getPublicTeacherName(course.teacherName);
 
   // Compute completed lessons
   const allLessons: Lesson[] = course.modules?.flatMap(m => m.lessons) || [];
@@ -139,12 +141,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               <div className="flex items-center gap-3 pt-2">
                 <img
                   src={course.teacherAvatar}
-                  alt={course.teacherName}
+                  alt={publicTeacherName}
                   className="w-10 h-10 rounded-full object-cover ring-1 ring-white/20"
                 />
                 <div>
                   <p className="text-[10px] font-mono uppercase tracking-widest text-white/40">Professor / Criador</p>
-                  <p className="text-sm font-semibold text-white">{course.teacherName}</p>
+                  <p className="text-sm font-semibold text-white">{publicTeacherName}</p>
                 </div>
               </div>
             </div>

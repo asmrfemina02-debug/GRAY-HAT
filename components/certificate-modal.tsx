@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Course, User } from '@/lib/types';
+import { getPublicTeacherName } from '@/lib/course-utils';
 import { Award, Download, Printer, X, CheckCircle2, Shield, Sparkles } from 'lucide-react';
 
 interface CertificateModalProps {
@@ -92,7 +93,7 @@ export function CertificateModal({ course, user, onClose }: CertificateModalProp
             <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-xl max-w-xl mx-auto shadow-md">
               <h3 className="text-lg font-extrabold text-amber-300">{course.title}</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Ministrado por <span className="text-slate-200 font-medium">{course.teacherName}</span>
+                Ministrado por <span className="text-slate-200 font-medium">{getPublicTeacherName(course.teacherName)}</span>
               </p>
             </div>
 

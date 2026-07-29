@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Hls from 'hls.js';
 import { VideoSourceType } from '@/lib/types';
 import { normalizeVideoLink, SupportedVideoSource } from '@/lib/video-links';
 import { AlertCircle, ExternalLink, Send } from 'lucide-react';
@@ -12,8 +13,56 @@ interface VideoPlayerProps {
   onEnded?: () => void;
 }
 
+function HlsVideo({ src, title, onEnded, onError }: {
+  src: string;
+  title: string;
+  onEnded?: () => void;
+  onError: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src;
+      return;
+    }
+
+    if (!Hls.isSupported()) {
+      onError();
+      return;
+    }
+
+    const hls = new Hls();
+    hls.loadSource(src);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.ERROR, (_event, data) => {
+      if (data.fatal) onError();
+    });
+
+    return () => hls.destroy();
+  }, [src, onError]);
+
+  return (
+    <video
+      ref={videoRef}
+      title={title}
+      controls
+      playsInline
+      preload="metadata"
+      className="w-full h-full object-contain"
+      onEnded={onEnded}
+    >
+      Seu navegador não suporta a reprodução deste vídeo.
+    </video>
+  );
+}
+
 export function VideoPlayer({ videoUrl, sourceType, title, onEnded }: VideoPlayerProps) {
   const [hasError, setHasError] = useState(false);
+  const handlePlaybackError = useCallback(() => setHasError(true), []);
   const result = sourceType === 'upload'
     ? { embedUrl: '', error: 'Vídeos MP4 diretos não são mais suportados.' }
     : normalizeVideoLink(videoUrl, sourceType as SupportedVideoSource);
@@ -21,7 +70,14 @@ export function VideoPlayer({ videoUrl, sourceType, title, onEnded }: VideoPlaye
 
   return (
     <div className="relative aspect-video w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-2xl group">
-      {isPrivateTelegram ? (
+      {sourceType === 'cakto' && result.embedUrl && !hasError ? (
+        <HlsVideo
+          src={result.embedUrl}
+          title={title}
+          onEnded={onEnded}
+          onError={handlePlaybackError}
+        />
+      ) : isPrivateTelegram ? (
         <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-[#17212b] to-[#0e1621]">
           <div className="w-16 h-16 rounded-full bg-[#2aabee] flex items-center justify-center mb-4 shadow-lg shadow-sky-500/20">
             <Send className="w-8 h-8 text-white" />

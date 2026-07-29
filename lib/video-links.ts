@@ -89,6 +89,20 @@ export function normalizeVideoLink(rawUrl: string, sourceType: SupportedVideoSou
     return { embedUrl: url.toString() };
   }
 
+  if (sourceType === 'cakto') {
+    if (
+      url.protocol !== 'https:'
+      || host !== 'stream.cakto.com.br'
+      || !url.pathname.endsWith('/playlist.m3u8')
+    ) {
+      return {
+        embedUrl: '',
+        error: 'Use um link HTTPS no formato stream.cakto.com.br/.../playlist.m3u8.'
+      };
+    }
+    return { embedUrl: url.toString() };
+  }
+
   if (sourceType === 'telegram') {
     if (!['t.me', 'telegram.me'].includes(host)) {
       return { embedUrl: '', error: 'Use um link de mensagem t.me.' };

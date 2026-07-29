@@ -445,10 +445,12 @@ function CreatorPanelContent() {
                 <label className="font-mono uppercase text-[10px] tracking-wider text-white/60">URL da Capa</label>
                 <input
                   type="text"
+                  placeholder="https://cdn-checkout.cakto.com.br/images/arquivo.jpg"
                   value={coverUrl}
                   onChange={(e) => setCoverUrl(e.target.value)}
                   className="w-full bg-[#050505] border border-white/10 rounded-xl p-3 text-white font-mono text-xs focus:outline-none focus:border-white/30"
                 />
+                <p className="text-[10px] text-white/35">Aceita imagens hospedadas em cdn-checkout.cakto.com.br/images/.</p>
               </div>
 
               <div className="space-y-1.5">
@@ -525,7 +527,7 @@ function CreatorPanelContent() {
                         <label className="font-mono uppercase text-[10px] tracking-wider text-white/50">URL da capa do módulo</label>
                         <input
                           type="url"
-                          placeholder="https://.../capa-do-modulo.jpg"
+                          placeholder="https://cdn-checkout.cakto.com.br/images/capa-do-modulo.jpg"
                           value={mod.coverUrl || ''}
                           onChange={(e) => {
                             const coverUrl = e.target.value;
@@ -533,7 +535,7 @@ function CreatorPanelContent() {
                           }}
                           className="w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-white/30"
                         />
-                        <p className="text-[10px] text-white/35">Formato recomendado: vertical 2:3, como uma capa de streaming.</p>
+                        <p className="text-[10px] text-white/35">Aceita o CDN de imagens da Cakto. Formato recomendado: vertical 2:3.</p>
                       </div>
                     </div>
 
@@ -580,6 +582,7 @@ function CreatorPanelContent() {
                               <option value="cloudflare">Cloudflare Stream</option>
                               <option value="bunny">Bunny Stream</option>
                               <option value="zdmplay">ZDM Play (CDN / API Stream)</option>
+                              <option value="cakto">Cakto Stream (.m3u8)</option>
                               <option value="telegram">Telegram (Link da mensagem)</option>
                             </select>
 

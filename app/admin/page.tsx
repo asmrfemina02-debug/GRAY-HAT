@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import { Course } from '@/lib/types';
 import {
   ShieldCheck,
@@ -54,7 +53,6 @@ export default function AdminPanelPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans">
-      <RoleSwitcherBanner />
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
@@ -268,7 +266,7 @@ export default function AdminPanelPage() {
                     </span>
                     <span className="font-semibold text-white">{rep.targetTitle}</span>
                   </div>
-                  <p className="text-white/60 mt-1">Denunciado por {rep.reporterName}: "{rep.details}"</p>
+                  <p className="text-white/60 mt-1">Denunciado por {rep.reporterName}: &ldquo;{rep.details}&rdquo;</p>
                 </div>
 
                 {rep.status === 'pending' ? (

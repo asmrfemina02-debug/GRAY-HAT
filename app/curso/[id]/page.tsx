@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import { CourseCard } from '@/components/course-card';
 import { Lesson } from '@/lib/types';
 import {
@@ -93,7 +92,6 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans">
-      <RoleSwitcherBanner />
       <Navbar />
 
       <main className="flex-1 space-y-8 pb-16">
@@ -131,7 +129,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               <div className="flex flex-wrap items-center gap-6 text-xs text-white/60 pt-2 border-t border-white/10 font-sans">
                 <div className="flex items-center gap-1.5 text-amber-300 font-bold">
                   <Star className="w-4 h-4 fill-amber-300 text-amber-300" />
-                  <span className="text-sm">{course.rating || '5.0'}</span>
+                  <span className="text-sm">{course.reviewCount > 0 ? course.rating : 'Sem avaliações'}</span>
                   <span className="text-white/40 text-xs font-normal">({course.reviewCount} avaliações)</span>
                 </div>
 
@@ -424,7 +422,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       </div>
 
                       <p className="text-xs text-white/70 leading-relaxed pl-11">
-                        "{rev.comment}"
+                        &ldquo;{rev.comment}&rdquo;
                       </p>
                     </div>
                   ))

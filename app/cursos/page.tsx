@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import { CourseCard } from '@/components/course-card';
 import { Search, Filter, SlidersHorizontal, Bookmark, X, BookOpen } from 'lucide-react';
 
@@ -224,7 +223,6 @@ function CatalogContent() {
 export default function CatalogPage() {
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans">
-      <RoleSwitcherBanner />
       <Navbar />
       <main className="flex-1">
         <Suspense fallback={<div className="p-12 text-center text-white/40 font-mono text-xs uppercase tracking-widest">Carregando catálogo...</div>}>

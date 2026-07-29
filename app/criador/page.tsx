@@ -7,7 +7,6 @@ import { useApp } from '@/lib/store';
 import { Course, CourseLevel, Module, Lesson, VideoSourceType } from '@/lib/types';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import {
   PlusCircle,
   Video,
@@ -45,8 +44,8 @@ export default function CreatorPanelPage() {
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('cat-ia');
   const [level, setLevel] = useState<CourseLevel>('Iniciante');
-  const [coverUrl, setCoverUrl] = useState('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80');
-  const [bannerUrl, setBannerUrl] = useState('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&auto=format&fit=crop&q=80');
+  const [coverUrl, setCoverUrl] = useState('');
+  const [bannerUrl, setBannerUrl] = useState('');
   const [tags, setTags] = useState('IA, Automação, Vendas');
 
   // Modules Builder State
@@ -168,7 +167,6 @@ export default function CreatorPanelPage() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans">
-      <RoleSwitcherBanner />
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
@@ -290,7 +288,7 @@ export default function CreatorPanelPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-white/50 font-mono mt-0.5">{course.totalStudents} alunos • {course.rating || '5.0'}★ • {course.durationMinutes} min</p>
+                      <p className="text-xs text-white/50 font-mono mt-0.5">{course.totalStudents} alunos • {course.reviewCount > 0 ? `${course.rating}★` : 'Sem avaliações'} • {course.durationMinutes} min</p>
                     </div>
                   </div>
 

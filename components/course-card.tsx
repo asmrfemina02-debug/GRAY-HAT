@@ -95,11 +95,13 @@ export function CourseCard({ course, compact = false }: CourseCardProps) {
             <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/40">
               {course.categoryId.replace('cat-', '').toUpperCase()}
             </span>
-            <div className="flex items-center gap-1 text-amber-300 font-bold text-xs">
-              <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-              <span>{course.rating || '5.0'}</span>
-              <span className="text-white/30 text-[10px] font-normal">({course.reviewCount})</span>
-            </div>
+            {course.reviewCount > 0 && (
+              <div className="flex items-center gap-1 text-amber-300 font-bold text-xs">
+                <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                <span>{course.rating}</span>
+                <span className="text-white/30 text-[10px] font-normal">({course.reviewCount})</span>
+              </div>
+            )}
           </div>
 
           {/* Title */}

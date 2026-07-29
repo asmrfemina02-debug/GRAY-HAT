@@ -7,9 +7,10 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({
-        summary: "Resumo gerado (Modo de Demonstração offline): Esta aula aborda os conceitos essenciais do tema com foco prático, destacando ganchos de alta retenção, estratégias diretas e execução sem rodeios."
-      });
+      return NextResponse.json(
+        { summary: 'O resumo automático ainda não está configurado.' },
+        { status: 503 }
+      );
     }
 
     const ai = new GoogleGenAI({

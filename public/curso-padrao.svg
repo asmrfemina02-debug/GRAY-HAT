@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Imagem padrão do curso">
+  <rect width="1200" height="675" fill="#0a0a0a"/>
+  <rect x="2" y="2" width="1196" height="671" rx="28" fill="none" stroke="#262626" stroke-width="4"/>
+  <path d="M530 255h140v165H530z" fill="#171717" stroke="#404040" stroke-width="5"/>
+  <path d="M560 300h80M560 335h80M560 370h52" stroke="#737373" stroke-width="8" stroke-linecap="round"/>
+</svg>

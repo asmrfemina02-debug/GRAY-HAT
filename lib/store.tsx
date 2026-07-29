@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Course, CourseStatus, User, UserRole, UserProgress, CourseReview, CourseComment, ContentReport, Category } from './types';
 import { INITIAL_USERS, INITIAL_COURSES, INITIAL_REVIEWS, INITIAL_COMMENTS, INITIAL_REPORTS, CATEGORIES } from './seed-data';
 
@@ -40,9 +40,29 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const STORAGE_VERSION = '2';
+const STORAGE_KEYS = [
+  'grayhat_users',
+  'grayhat_courses',
+  'grayhat_progress',
+  'grayhat_favorites',
+  'grayhat_reviews',
+  'grayhat_comments',
+  'grayhat_reports',
+];
+
+function removeTemplateDataFromStorage() {
+  if (typeof window === 'undefined') return;
+  if (localStorage.getItem('grayhat_data_version') === STORAGE_VERSION) return;
+
+  STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+  localStorage.setItem('grayhat_data_version', STORAGE_VERSION);
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [users, setUsers] = useState<User[]>(() => {
     if (typeof window !== 'undefined') {
+      removeTemplateDataFromStorage();
       const saved = localStorage.getItem('grayhat_users');
       if (saved) {
         try { return JSON.parse(saved); } catch (e) { console.error(e); }
@@ -70,9 +90,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try { return JSON.parse(saved); } catch (e) { console.error(e); }
       }
     }
-    return [
-      { courseId: 'course-ia-101', lessonId: 'les-1-1', completed: true, lastWatchedSeconds: 1080, updatedAt: new Date().toISOString() }
-    ];
+    return [];
   });
 
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -82,7 +100,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         try { return JSON.parse(saved); } catch (e) { console.error(e); }
       }
     }
-    return ['course-ia-101'];
+    return [];
   });
 
   const [reviews, setReviews] = useState<CourseReview[]>(() => {
@@ -129,6 +147,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [users, courses, userProgress, favorites, reviews, comments, reports]);
 
   const currentUser = users.find(u => u.role === currentRole) || users[0];
+  const categories = useMemo(
+    () => CATEGORIES.map(category => ({
+      ...category,
+      courseCount: courses.filter(course => (
+        course.status === 'published' && course.categoryId === category.id
+      )).length,
+    })),
+    [courses]
+  );
 
   const switchRole = (role: UserRole) => {
     setCurrentRole(role);
@@ -184,21 +211,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       id,
       title: courseData.title || 'Novo Curso Sem Título',
       slug: (courseData.title || 'novo-curso').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      shortDescription: courseData.shortDescription || 'Descrição curta do curso',
-      description: courseData.description || 'Descrição completa do curso',
-      coverUrl: courseData.coverUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80',
-      bannerUrl: courseData.bannerUrl || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&auto=format&fit=crop&q=80',
+      shortDescription: courseData.shortDescription || '',
+      description: courseData.description || '',
+      coverUrl: courseData.coverUrl || '/curso-padrao.svg',
+      bannerUrl: courseData.bannerUrl || '/curso-padrao.svg',
       categoryId: courseData.categoryId || 'cat-ia',
       teacherId: currentUser.id,
       teacherName: currentUser.name,
       teacherAvatar: currentUser.avatar,
       level: courseData.level || 'Iniciante',
-      durationMinutes: courseData.durationMinutes || 60,
-      totalLessons: courseData.modules ? courseData.modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) : 1,
+      durationMinutes: courseData.durationMinutes || 0,
+      totalLessons: courseData.modules ? courseData.modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) : 0,
       totalStudents: courseData.totalStudents || 0,
-      rating: courseData.rating || 5.0,
+      rating: courseData.rating || 0,
       reviewCount: courseData.reviewCount || 0,
-      tags: courseData.tags || ['Inovação', 'Gratuito'],
+      tags: courseData.tags || [],
       status,
       certificateEnabled: courseData.certificateEnabled ?? true,
       language: courseData.language || 'Português',
@@ -224,7 +251,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCourses(prev => prev.map(c => c.id === courseId ? {
       ...c,
       status: 'published',
-      adminNotes: adminNotes || 'Curso aprovado pela administração do Gray Hat.',
+      adminNotes: adminNotes || '',
       updatedAt: new Date().toISOString()
     } : c));
   };
@@ -322,7 +349,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         switchRole,
         courses,
-        categories: CATEGORIES,
+        categories,
         userProgress,
         favorites,
         reviews,

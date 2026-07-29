@@ -7,7 +7,6 @@ import confetti from 'canvas-confetti';
 import { useApp } from '@/lib/store';
 import { Lesson } from '@/lib/types';
 import { Navbar } from '@/components/navbar';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import { VideoPlayer } from '@/components/video-player';
 import { CertificateModal } from '@/components/certificate-modal';
 import {
@@ -162,7 +161,6 @@ export default function LessonPlayerPage({
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans">
-      <RoleSwitcherBanner />
 
       {/* TOP COMPACT NAVIGATION HEADER */}
       <header className="bg-[#0c0c0c] border-b border-white/10 px-4 py-3 sticky top-0 z-30 flex items-center justify-between gap-4 font-sans">

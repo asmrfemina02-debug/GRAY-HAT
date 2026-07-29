@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import { CourseCard } from '@/components/course-card';
 import {
   Flame,
@@ -41,7 +40,6 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans">
-      <RoleSwitcherBanner />
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 font-sans">

@@ -25,6 +25,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: 'Início' },
     { href: '/cursos', label: 'Cursos' },
+    { href: '/metodo', label: 'Os 3 Chapéus' },
     { href: '/cursos?favorite=true', label: 'Minha Lista', badge: favorites.length > 0 ? favorites.length : undefined },
   ];
 
@@ -171,6 +172,13 @@ export function Navbar() {
               className="px-3 py-2 rounded-lg text-xs text-white/80 hover:bg-white/5"
             >
               Todos os Cursos
+            </Link>
+            <Link
+              href="/metodo"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg text-xs text-white/80 hover:bg-white/5"
+            >
+              White, Gray e Black Hat
             </Link>
             <Link
               href="/cursos?favorite=true"

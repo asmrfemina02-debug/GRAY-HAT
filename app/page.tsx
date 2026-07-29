@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { RoleSwitcherBanner } from '@/components/role-switcher-banner';
 import { CourseCard } from '@/components/course-card';
 import {
   Search,
@@ -67,9 +66,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#050505] text-[#e5e5e5] flex flex-col font-sans selection:bg-white selection:text-black">
       
-      {/* Role Switcher Demo Banner */}
-      <RoleSwitcherBanner />
-
       {/* Main Navbar */}
       <Navbar />
 
@@ -276,63 +272,17 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredCourses.map(course => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
-        </section>
-
-        {/* CRIADORES EM DESTAQUE */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="bg-[#0c0c0c] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-serif italic text-white">Criadores & Professores da Comunidade</h2>
-                <p className="text-xs text-white/50 mt-1">Especialistas que compartilham seus conhecimentos sem cobrar fortunas por mentorias.</p>
-              </div>
-
-              <Link
-                href="/criador"
-                className="px-4 py-2 bg-white hover:bg-[#e5e5e5] text-black font-mono uppercase text-xs tracking-wider font-semibold rounded-xl transition-all shadow-md flex items-center gap-2 w-fit"
-              >
-                <span>Tornar-se um Criador</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+          {featuredCourses.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredCourses.map(course => (
+                <CourseCard key={course.id} course={course} />
+              ))}
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-[#050505] border border-white/10 rounded-xl flex items-center gap-4">
-                <img
-                  src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80"
-                  alt="Gabriel Santos"
-                  className="w-12 h-12 rounded-full object-cover ring-1 ring-white/20"
-                />
-                <div>
-                  <h4 className="font-semibold text-sm text-white">Gabriel "Gray" Santos</h4>
-                  <p className="text-xs text-white/50">4 cursos publicados • 1.420 seguidores</p>
-                  <span className="mt-1 inline-block text-[9px] font-mono tracking-widest uppercase text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.2 rounded-full">
-                    Criador Estrela
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-[#050505] border border-white/10 rounded-xl flex items-center gap-4">
-                <img
-                  src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80"
-                  alt="Elena Rostova"
-                  className="w-12 h-12 rounded-full object-cover ring-1 ring-white/20"
-                />
-                <div>
-                  <h4 className="font-semibold text-sm text-white">Elena Rostova</h4>
-                  <p className="text-xs text-white/50">Administradora & Revisora</p>
-                  <span className="mt-1 inline-block text-[9px] font-mono tracking-widest uppercase text-purple-300 bg-purple-500/10 border border-purple-500/20 px-2 py-0.2 rounded-full">
-                    Guardião do Repositório
-                  </span>
-                </div>
-              </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-12 text-center">
+              <p className="text-sm text-white/60">Nenhum curso publicado até o momento.</p>
             </div>
-          </div>
+          )}
         </section>
 
       </main>

@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useApp } from '@/lib/store';
+import { useAdminAuth } from '@/lib/admin-auth';
 import { Search, Flame, Trophy, Bookmark, PlusCircle, Shield, Menu, X, Terminal, User as UserIcon, Sparkles } from 'lucide-react';
 
 export function Navbar() {
   const { currentUser, favorites, courses } = useApp();
+  const { isAdmin } = useAdminAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,15 +103,17 @@ export function Navbar() {
           </div>
 
           {/* Quick Role Links */}
-          <Link
-            href="/criador"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/15 transition-all"
-          >
-            <PlusCircle className="w-3.5 h-3.5 text-white/80" />
-            <span>Criar Curso</span>
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/criador"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/15 text-white border border-white/15 transition-all"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-white/80" />
+              <span>Criar Curso</span>
+            </Link>
+          )}
 
-          {currentUser.role === 'admin' && (
+          {isAdmin && (
             <Link
               href="/admin"
               className="relative hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-950/40 hover:bg-purple-900/60 text-purple-200 border border-purple-500/30 transition-all"
@@ -187,14 +191,16 @@ export function Navbar() {
             >
               Minha Lista ({favorites.length})
             </Link>
-            <Link
-              href="/criador"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg text-xs text-white hover:bg-white/5 font-medium"
-            >
-              Painel do Criador (Publicar)
-            </Link>
-            {currentUser.role === 'admin' && (
+            {isAdmin && (
+              <Link
+                href="/criador"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-lg text-xs text-white hover:bg-white/5 font-medium"
+              >
+                Criar Curso
+              </Link>
+            )}
+            {isAdmin && (
               <Link
                 href="/admin"
                 onClick={() => setIsMobileMenuOpen(false)}

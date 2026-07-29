@@ -1,8 +1,19 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import { Course, CourseStatus, User, UserRole, UserProgress, CourseReview, CourseComment, ContentReport, Category } from './types';
 import { INITIAL_USERS, INITIAL_COURSES, INITIAL_REVIEWS, INITIAL_COMMENTS, INITIAL_REPORTS, CATEGORIES } from './seed-data';
+import { firestore } from './firebase';
+import { useAdminAuth } from './admin-auth';
 
 interface AppContextType {
   currentUser: User;
@@ -60,6 +71,7 @@ function removeTemplateDataFromStorage() {
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const { isAdmin, user: adminAccount } = useAdminAuth();
   const [users, setUsers] = useState<User[]>(() => {
     if (typeof window !== 'undefined') {
       removeTemplateDataFromStorage();
@@ -74,12 +86,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentRole, setCurrentRole] = useState<UserRole>('aluno');
 
   const [courses, setCourses] = useState<Course[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('grayhat_courses');
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) { console.error(e); }
-      }
-    }
     return INITIAL_COURSES;
   });
 
@@ -146,6 +152,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [users, courses, userProgress, favorites, reviews, comments, reports]);
 
+  useEffect(() => {
+    if (!firestore) return;
+
+    const coursesCollection = collection(firestore, 'courses');
+    const coursesQuery = isAdmin
+      ? coursesCollection
+      : query(coursesCollection, where('status', '==', 'published'));
+
+    return onSnapshot(
+      coursesQuery,
+      snapshot => {
+        setCourses(snapshot.docs.map(courseDocument => courseDocument.data() as Course));
+      },
+      error => {
+        console.error('Não foi possível carregar os cursos do Firestore:', error);
+        setCourses([]);
+      }
+    );
+  }, [isAdmin]);
+
   const currentUser = users.find(u => u.role === currentRole) || users[0];
   const categories = useMemo(
     () => CATEGORIES.map(category => ({
@@ -201,6 +227,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const createOrUpdateCourse = (courseData: Partial<Course>, submitForReview = false): Course => {
+    if (!isAdmin || !adminAccount) {
+      throw new Error('Apenas administradores podem criar ou editar cursos.');
+    }
     const isEdit = courseData.id && courses.some(c => c.id === courseData.id);
     const id = isEdit ? courseData.id! : `course-${Date.now()}`;
     const now = new Date().toISOString();
@@ -216,9 +245,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       coverUrl: courseData.coverUrl || '/curso-padrao.svg',
       bannerUrl: courseData.bannerUrl || '/curso-padrao.svg',
       categoryId: courseData.categoryId || 'cat-ia',
-      teacherId: currentUser.id,
-      teacherName: currentUser.name,
-      teacherAvatar: currentUser.avatar,
+      teacherId: adminAccount.uid,
+      teacherName: adminAccount.displayName || adminAccount.email || 'Administrador',
+      teacherAvatar: adminAccount.photoURL || '/avatar-padrao.svg',
       level: courseData.level || 'Iniciante',
       durationMinutes: courseData.durationMinutes || 0,
       totalLessons: courseData.modules ? courseData.modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) : 0,
@@ -239,34 +268,62 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } else {
       setCourses(prev => [newCourse, ...prev]);
     }
+    if (firestore) {
+      void setDoc(
+        doc(firestore, 'courses', id),
+        JSON.parse(JSON.stringify(newCourse))
+      );
+    }
 
     return newCourse;
   };
 
   const deleteCourse = (courseId: string) => {
     setCourses(prev => prev.filter(c => c.id !== courseId));
+    if (firestore) void deleteDoc(doc(firestore, 'courses', courseId));
   };
 
   const approveCourse = (courseId: string, adminNotes?: string) => {
-    setCourses(prev => prev.map(c => c.id === courseId ? {
-      ...c,
-      status: 'published',
-      adminNotes: adminNotes || '',
-      updatedAt: new Date().toISOString()
-    } : c));
+    setCourses(prev => prev.map(c => {
+      if (c.id !== courseId) return c;
+      const updatedCourse: Course = {
+        ...c,
+        status: 'published',
+        adminNotes: adminNotes || '',
+        updatedAt: new Date().toISOString()
+      };
+      if (firestore) {
+        void setDoc(doc(firestore, 'courses', courseId), JSON.parse(JSON.stringify(updatedCourse)));
+      }
+      return updatedCourse;
+    }));
   };
 
   const rejectCourse = (courseId: string, reason: string) => {
-    setCourses(prev => prev.map(c => c.id === courseId ? {
-      ...c,
-      status: 'rejected',
-      rejectionReason: reason,
-      updatedAt: new Date().toISOString()
-    } : c));
+    setCourses(prev => prev.map(c => {
+      if (c.id !== courseId) return c;
+      const updatedCourse: Course = {
+        ...c,
+        status: 'rejected',
+        rejectionReason: reason,
+        updatedAt: new Date().toISOString()
+      };
+      if (firestore) {
+        void setDoc(doc(firestore, 'courses', courseId), JSON.parse(JSON.stringify(updatedCourse)));
+      }
+      return updatedCourse;
+    }));
   };
 
   const toggleFeatureCourse = (courseId: string) => {
-    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, isFeatured: !c.isFeatured } : c));
+    setCourses(prev => prev.map(c => {
+      if (c.id !== courseId) return c;
+      const updatedCourse = { ...c, isFeatured: !c.isFeatured };
+      if (firestore) {
+        void setDoc(doc(firestore, 'courses', courseId), JSON.parse(JSON.stringify(updatedCourse)));
+      }
+      return updatedCourse;
+    }));
   };
 
   const addReview = (courseId: string, rating: number, comment: string) => {

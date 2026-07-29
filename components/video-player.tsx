@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { VideoSourceType } from '@/lib/types';
 import { normalizeVideoLink, SupportedVideoSource } from '@/lib/video-links';
-import { AlertCircle, ExternalLink } from 'lucide-react';
+import { AlertCircle, ExternalLink, Send } from 'lucide-react';
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -17,10 +17,30 @@ export function VideoPlayer({ videoUrl, sourceType, title, onEnded }: VideoPlaye
   const result = sourceType === 'upload'
     ? { embedUrl: '', error: 'Vídeos MP4 diretos não são mais suportados.' }
     : normalizeVideoLink(videoUrl, sourceType as SupportedVideoSource);
+  const isPrivateTelegram = sourceType === 'telegram' && /^https:\/\/t\.me\/c\/\d+\/\d+\/?$/i.test(result.embedUrl);
 
   return (
     <div className="relative aspect-video w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-800 shadow-2xl group">
-      {sourceType === 'zdmplay' && result.embedUrl && !hasError ? (
+      {isPrivateTelegram ? (
+        <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-[#17212b] to-[#0e1621]">
+          <div className="w-16 h-16 rounded-full bg-[#2aabee] flex items-center justify-center mb-4 shadow-lg shadow-sky-500/20">
+            <Send className="w-8 h-8 text-white" />
+          </div>
+          <h3 className="font-bold text-lg text-white">Vídeo privado no Telegram</h3>
+          <p className="text-sm text-white/60 max-w-md mt-2">
+            Entre no Telegram com uma conta que seja membro do canal para assistir a esta aula.
+          </p>
+          <a
+            href={result.embedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 px-5 py-2.5 bg-[#2aabee] hover:bg-[#229ed9] text-white font-bold text-sm rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <span>Abrir vídeo no Telegram</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+      ) : sourceType === 'zdmplay' && result.embedUrl && !hasError ? (
         <video
           src={result.embedUrl}
           title={title}

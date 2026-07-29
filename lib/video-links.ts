@@ -84,5 +84,18 @@ export function normalizeVideoLink(rawUrl: string, sourceType: SupportedVideoSou
     return { embedUrl: url.toString() };
   }
 
+  if (sourceType === 'telegram') {
+    if (!['t.me', 'telegram.me'].includes(host)) {
+      return { embedUrl: '', error: 'Use um link de mensagem t.me.' };
+    }
+    if (parts[0] === 'c' && /^\d+$/.test(parts[1] || '') && /^\d+$/.test(parts[2] || '')) {
+      return { embedUrl: `https://t.me/c/${parts[1]}/${parts[2]}` };
+    }
+    if (parts[0] && parts[0] !== 'c' && /^\d+$/.test(parts[1] || '')) {
+      return { embedUrl: `https://t.me/${parts[0]}/${parts[1]}?embed=1&mode=tme` };
+    }
+    return { embedUrl: '', error: 'Use o link direto de uma mensagem ou vídeo do Telegram.' };
+  }
+
   return { embedUrl: '', error: 'Plataforma de vídeo não suportada.' };
 }

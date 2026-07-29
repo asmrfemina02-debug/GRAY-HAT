@@ -554,6 +554,7 @@ function CreatorPanelContent() {
                               <option value="cloudflare">Cloudflare Stream</option>
                               <option value="bunny">Bunny Stream</option>
                               <option value="zdmplay">ZDM Play (cdn.zdmplay.com)</option>
+                              <option value="telegram">Telegram (Link da mensagem)</option>
                             </select>
 
                             <input

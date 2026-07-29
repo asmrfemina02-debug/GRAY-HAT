@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import { useAdminAuth } from '@/lib/admin-auth';
-import { Search, Flame, Trophy, Bookmark, PlusCircle, Shield, Menu, X, Terminal, User as UserIcon, Sparkles } from 'lucide-react';
+import { Search, Bookmark, PlusCircle, Shield, Menu, X, Terminal, User as UserIcon, Sparkles } from 'lucide-react';
 
 export function Navbar() {
   const { currentUser, favorites, courses } = useApp();
@@ -89,19 +89,6 @@ export function Navbar() {
         {/* Right Actions & Gamification Badge */}
         <div className="flex items-center gap-3">
           
-          {/* Gamification Streak & XP */}
-          <div className="hidden sm:flex items-center gap-2 bg-[#0d0d0d] border border-white/10 rounded-full px-3 py-1">
-            <div className="flex items-center gap-1 text-amber-300 text-xs font-semibold" title="Sequência diária de estudos">
-              <Flame className="w-4 h-4 fill-amber-400/20 text-amber-300" />
-              <span>{currentUser.streakDays}d</span>
-            </div>
-            <span className="text-white/20">|</span>
-            <div className="flex items-center gap-1 text-white/80 text-xs font-semibold" title="XP Acumulado">
-              <Trophy className="w-3.5 h-3.5 text-amber-300" />
-              <span>{currentUser.xp} XP</span>
-            </div>
-          </div>
-
           {/* Quick Role Links */}
           {isAdmin && (
             <Link

@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   FileText,
   Download,
   ExternalLink,
@@ -25,7 +26,9 @@ import {
   ThumbsUp,
   Clock,
   Play,
-  Share2
+  Share2,
+  PanelRightClose,
+  PanelRightOpen
 } from 'lucide-react';
 
 export default function LessonPlayerPage({
@@ -39,6 +42,8 @@ export default function LessonPlayerPage({
 
   const [activeTab, setActiveTab] = useState<'notes' | 'resources' | 'quiz' | 'comments' | 'ai'>('notes');
   const [showCertModal, setShowCertModal] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(true);
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
 
   // Quiz state
   const [selectedQuizAnswers, setSelectedQuizAnswers] = useState<Record<string, number>>({});
@@ -223,14 +228,25 @@ export default function LessonPlayerPage({
             </Link>
           )}
 
+          <button
+            type="button"
+            onClick={() => setShowPlaylist(previous => !previous)}
+            className="p-2 bg-[#050505] hover:bg-white/10 border border-white/10 rounded-xl text-white/70"
+            title={showPlaylist ? 'Ocultar módulos e ampliar vídeo' : 'Mostrar módulos'}
+          >
+            {showPlaylist ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+          </button>
+
         </div>
       </header>
 
       {/* MAIN TWO-COLUMN WORKSPACE */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={`flex-1 w-full mx-auto p-4 sm:p-6 grid grid-cols-1 gap-6 transition-all ${
+        showPlaylist ? 'max-w-7xl lg:grid-cols-3' : 'max-w-6xl'
+      }`}>
         
         {/* LEFT COLUMN: PLAYER & TABS (2 cols) */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className={`${showPlaylist ? 'lg:col-span-2' : ''} space-y-6`}>
           
           {/* Universal Video Player */}
           <VideoPlayer
@@ -510,7 +526,7 @@ export default function LessonPlayerPage({
         </div>
 
         {/* RIGHT COLUMN: MODULES PLAYLIST SIDEBAR */}
-        <div className="space-y-4">
+        {showPlaylist && <div className="space-y-4">
           <div className="bg-[#0c0c0c] border border-white/10 rounded-2xl p-4 space-y-3 shadow-xl">
             <h3 className="font-serif italic text-sm text-white flex items-center justify-between">
               <span>Conteúdo do Curso</span>
@@ -518,9 +534,19 @@ export default function LessonPlayerPage({
             </h3>
 
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
-              {course.modules?.map((mod, modIdx) => (
+              {course.modules?.map((mod, modIdx) => {
+                const containsCurrentLesson = mod.lessons?.some(lesson => lesson.id === currentLesson.id);
+                const isModuleExpanded = expandedModules[mod.id] ?? containsCurrentLesson;
+
+                return (
                 <div key={mod.id} className="space-y-1.5">
-                  <Link href={`/curso/${course.id}`} className="relative h-20 rounded-xl overflow-hidden border border-white/10 block group">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedModules(previous => ({ ...previous, [mod.id]: !isModuleExpanded }))}
+                    className={`relative h-20 w-full rounded-xl overflow-hidden border block group text-left ${
+                      containsCurrentLesson ? 'border-emerald-400/40' : 'border-white/10'
+                    }`}
+                  >
                     <img
                       src={mod.coverUrl || course.coverUrl || '/curso-padrao.svg'}
                       alt={mod.title}
@@ -531,8 +557,11 @@ export default function LessonPlayerPage({
                       <span className="text-[9px] font-mono uppercase tracking-widest text-emerald-300">Módulo {modIdx + 1}</span>
                       <p className="text-xs font-bold text-white line-clamp-2">{mod.title}</p>
                     </div>
-                  </Link>
-                  <div className="space-y-1">
+                    <span className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 border border-white/15 flex items-center justify-center">
+                      <ChevronDown className={`w-3.5 h-3.5 text-white transition-transform ${isModuleExpanded ? 'rotate-180' : ''}`} />
+                    </span>
+                  </button>
+                  {isModuleExpanded && <div className="space-y-1">
                     {mod.lessons?.map((les) => {
                       const isCurrent = les.id === currentLesson.id;
                       const isLesCompleted = userProgress.some(p => p.courseId === course.id && p.lessonId === les.id && p.completed);
@@ -559,12 +588,13 @@ export default function LessonPlayerPage({
                         </Link>
                       );
                     })}
-                  </div>
+                  </div>}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         </div>
+        }
 
       </div>
 
